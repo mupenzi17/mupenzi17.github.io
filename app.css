@@ -15,7 +15,22 @@
     font-weight: bold;
 }
 
-
+    .tech-icons img {
+      height: 50px;
+      margin: 10px;
+      filter: grayscale(100%);
+      transition: filter 0.3s ease;
+      cursor: pointer;
+    }
+    .tech-icons img:hover {
+      filter: none;
+    }
+    /* Projects */
+    .project-card img {
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
 
 .home{
     color: white;
@@ -123,7 +138,7 @@ span.theo {
   .about-img {
     width: 100%;
    
-    background-image: url('Images/DSC_9574.JPG');
+    background-image: url('Images/hero-bg.jpg');
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -148,7 +163,7 @@ span.theo {
   }
   .contact-img{
     border-radius: 300px;
-    background-image: url("Images/Screenshot_20230329-220011~5.jpg");
+    background-image: url("Images/hero-bg.jpg");
     background-repeat: no-repeat;
     background-size: 300px;
     background-position: center;
