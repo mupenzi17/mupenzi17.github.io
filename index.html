@@ -27,7 +27,6 @@
 
 <body id="body">
   
-  <canvas id="stars" style="position: absolute;" class="d-none d-md-block"></canvas>
  
   <nav class="navbar navbar-expand-lg fixed-top bg-dark navbar-light">
       <div class="container">
@@ -64,13 +63,14 @@
   </nav>
   
 	<section class="" id="home-section">
+    <canvas id="stars"></canvas>
      <div class="container-fluid">
   <div class="overlay"></div>
     <div class="text-center m-auto mt-0 home">
     
       
-      <div class="row mt-5">
-        <div class="col-md-5" style="margin-top: 200px;">
+      <div class="row">
+        <div class="col-md-5" style="margin-top: 50px;">
           
           Hey! My name is 
           <h2 class="name" data-aos="fade-left" data-aos-duration="3000">
@@ -108,7 +108,7 @@
   </section>
 
    <section class="vh-100 d-block bg-light" id="about-section">
-  <div class="container py-5">
+  <div class="container">
     <div class="row align-items-center">
 
       <!-- Image on large screens -->
@@ -147,8 +147,8 @@
 
 
     
-<section class="pt-5 pb-5 bg-dark text-light" id="contact-section">
-  <div class="container">
+<section class="pt-5 pb-5 bg-dark text-light" id="contact-section" >
+  <div class="container mt-5">
     <div class="text-center mb-4" data-aos="fade-up">
       <h2 class="display-5 fw-bold">Contact <span class="text-primary">Me</span></h2>
       <p class="fst-italic">I like to hear from you!</p>
@@ -376,7 +376,12 @@
 <script>
   document.getElementById("year").textContent = new Date().getFullYear();
 </script>
-
+<script>
+  window.addEventListener('scroll', function () {
+    const navbar = document.querySelector('.navbar');
+    navbar.classList.toggle('shrink', window.scrollY > 10);
+  });
+</script>
   
 <!-- BACK TO THE TOP -->
 <a href="#" class="back-to-top animate__animated animate__bounce d-block d-md-fixed">
@@ -612,83 +617,83 @@ new Waypoint({
 </script>
 
 <!-- ANIMATED HERO BACKGROUND -->
-<script type="text/javascript">
-	const canvas = document.getElementById("stars");
-const ctx = canvas.getContext("2d");
 
-let screen, stars, params = {speed: 0.5, number: 300, extinction: 4};
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const canvas = document.getElementById("stars");
+    const ctx = canvas.getContext("2d");
 
-setupStars();
-updateStars();
+    let screen, stars = [], animationId;
+    const params = { speed: 0.5, number: 300, extinction: 4 };
 
+    let mouseX = 0.5, mouseY = 0.5; // Normalized (0-1)
 
-// update stars on resize to keep the thing centered
-window.onresize = function () {
-    setupStars();
-    updateStars();
-};
+    function Star() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.z = Math.random() * canvas.width;
 
-// star constructor
-function Star() {
-    this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height;
-    this.z = Math.random() * canvas.width;
-
-    this.move = function () {
+      this.move = function () {
         this.z -= params.speed;
-        if (this.z <= 0) {
-            this.z = canvas.width;
-        }
-    };
+        if (this.z <= 0) this.z = canvas.width;
+      };
 
-    this.show = function () {
-        let x, y, rad, opacity;
-        x = (this.x - screen.c[0]) * (canvas.width / this.z);
-        x = x + screen.c[0];
-        y = (this.y - screen.c[1]) * (canvas.width / this.z);
-        y = y + screen.c[1];
-        rad = canvas.width / this.z;
-        opacity = (rad > params.extinction) ? 1.5 * (2 - rad / params.extinction) : 0.5;
+      this.show = function () {
+        const dx = (this.x - screen.c[0]) * (canvas.width / this.z);
+        const dy = (this.y - screen.c[1]) * (canvas.width / this.z);
+        const x = screen.c[0] + dx * (mouseX * 2 - 1);
+        const y = screen.c[1] + dy * (mouseY * 2 - 1);
+        const rad = canvas.width / this.z;
+        const opacity = rad > params.extinction ? 1.5 * (2 - rad / params.extinction) : 0.5;
 
         ctx.beginPath();
-        ctx.fillStyle = "rgba(255, 255, 255, " + opacity + ")";
+        ctx.fillStyle = `rgba(255,255,255,${opacity})`;
         ctx.arc(x, y, rad, 0, Math.PI * 2);
         ctx.fill();
+      };
     }
-}
 
-// setup <canvas>, create all the starts
-function setupStars() {
-    screen = {
+    function setupStars() {
+      screen = {
         w: window.innerWidth,
         h: window.innerHeight,
-        c: [window.innerWidth * 0.5, window.innerHeight * 0.5]
-    };
-    window.cancelAnimationFrame(updateStars);
-    canvas.width = screen.w;
-    canvas.height = screen.h;
-    stars = [];
-    for (let i = 0; i < params.number; i++) {
-        stars[i] = new Star();
-    }
-}
+        c: [window.innerWidth / 2, window.innerHeight / 2]
+      };
+      canvas.width = screen.w;
+      canvas.height = screen.h;
 
-function updateStars() {
-    ctx.fillStyle = "#131e22";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    stars.forEach(function (s) {
-        s.show();
-        s.move();
+      stars = Array.from({ length: params.number }, () => new Star());
+    }
+
+    function updateStars() {
+      ctx.fillStyle = "#131e22";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(star => {
+        star.show();
+        star.move();
+      });
+      animationId = requestAnimationFrame(updateStars);
+    }
+
+    // Mouse movement effect
+    window.addEventListener("mousemove", (e) => {
+      mouseX = e.clientX / window.innerWidth;
+      mouseY = e.clientY / window.innerHeight;
     });
-    window.requestAnimationFrame(updateStars);
-}
+
+    // Init
+    setupStars();
+    updateStars();
+
+    // Resize
+    window.addEventListener("resize", () => {
+      cancelAnimationFrame(animationId);
+      setupStars();
+      updateStars();
+    });
+  });
 </script>
-<script>
-  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl)
-  })
-  </script>
+
 
   <!-- ANIMATED COUNTER PROJECTS and CUSTOMERS-->
   <script type="text/javascript">
